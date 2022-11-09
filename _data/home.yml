@@ -9,88 +9,41 @@ navbar_entries:
     url: https://l3moon.me/
 
 project_entries:
-  - title: Project 1
+  - title: Java Security Notes
     url: overview-post
-    desc: This is an example project, configured in _data/home.yml
+    desc: This is a project that I have been working on for a while. It is a collection of notes on Java security. It is a work in progress and I will be adding more content to it as I learn more about Java security.
+          for more information about this project, please visit the project page.
 
-  - title: Project 2
+  - title: Web Security Notes
     url: overview-post
-    desc: Projects are shown in card layout
+    desc: Fun Web Security Notes
 
-  - title: Project 3
+  - title: Web writeups 
     url: overview-post
-    desc: You can control visibility from _config.yml file
+    desc: My CTF learning journey. 
 
-  - title: Project 4
+  - title: Blockchain Notes 
     url: overview-post
-    desc: This project uses highlight markup, configured in _data/home.yml
+    desc: My Blockchain learning journey. i'm still learning about this topic
+          i'm having so much fun ^^
     highlight: WIP
-
-  - title: Project 5
-    url: overview-post
-    desc: Moonwalk also has horizontal list (used in header and footer)
-    highlight: WIP
-
-  - title: Project 6
-    url: overview-post
-    desc: It also has a scalable vertical list (in case you need it)
 
 old_project_entries:
-  - title: Cookie
-    url: https://github.com/abhinavs/cookie
-    desc: An open source landing website with supporting pages and integrated blog
-
-  - title: Moonwalk
-    url: https://github.com/abhinavs/moonwalk
-    desc: A fast and minimalist Jekyll blog theme with clean dark mode
-
-  - title: Humangous
-    url: https://www.humangous.co
-    desc: The better people know you, the better they collaborate
+  - title: Securinets ISI CTF 2021
+    url: https://github.com/l3moon/Securinets-CTF2021/
+    desc: A Collection of Web exploitation Taks i made for Securinets ISI CTF 2021
 
 footer_entries:
-  - title: abhinav's homepage
-    url: https://www.abhinav.co
+  - title: L3moon's homepage
+    url: https://l3moon.me/
 
   - title: twitter
-    url: https://twitter.com/abhinav
+    url: https://twitter.com/le3moon
 
   - title: github
-    url: https://github.com/abhinavs
+    url: https://github.com/l3moon/
 
   - title: feed
     url: feed.xml
-
-misc_entries:
-  - title: this is an example vertical list
-    url: false
-
-  - title: you can show or hide using a boolean flag in _config.yml
-    url: false
-
-  - title: and you can add data in _data/home.yml
-    url: false
-
-  - title: Blog posts
-    post_list: true
-    url: false
-
-  - title: moonwalk on the Internet
-    url: false
-    entries:
-      - title: on Github
-        url: https://github.com/abhinavs/moonwalk
-
-      - title: originally built for abhinav's homepage
-        url: https://www.abhinav.co
-
-      - title: this list is scalable and can be nested
-        url: false
-        entries:
-          - title: this is nested inside a nested list
-            url: false
-
-          - title: it is easy to use, see _data/home.yml to see how to configure it.
-            url: false
 
 
