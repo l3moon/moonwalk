@@ -11,8 +11,7 @@ navbar_entries:
 project_entries:
   - title: Java Security Notes
     url: overview-post
-    desc: This is a project that I have been working on for a while. It is a collection of notes on Java security. It is a work in progress and I will be adding more content to it as I learn more about Java security.
-          for more information about this project, please visit the project page.
+    desc: This is a project that I have been working on for a while.
 
   - title: Web Security Notes
     url: overview-post
@@ -25,7 +24,6 @@ project_entries:
   - title: Blockchain Notes 
     url: overview-post
     desc: My Blockchain learning journey. i'm still learning about this topic
-          i'm having so much fun ^^
     highlight: WIP
 
 old_project_entries:
