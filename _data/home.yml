@@ -10,19 +10,19 @@ navbar_entries:
 
 project_entries:
   - title: Java Security Notes
-    url: overview-post
+    url: JavaSecurityNotes
     desc: This is a project that I have been working on for a while.
 
   - title: Web Security Notes
-    url: overview-post
+    url: webSecurityNotes
     desc: Fun Web Security Notes
 
   - title: Web writeups 
-    url: overview-post
+    url: webWriteups
     desc: My CTF learning journey. 
 
   - title: Blockchain Notes 
-    url: overview-post
+    url: blockchainNotes
     desc: My Blockchain learning journey. i'm still learning about this topic
     highlight: WIP
 
