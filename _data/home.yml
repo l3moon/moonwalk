@@ -2,7 +2,7 @@ navbar_entries:
   - title: about
     url: about
 
-  - title: L3moon Blog
+  - title: Blog
     url: blog
 
   - title: website
