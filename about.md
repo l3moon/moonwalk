@@ -27,7 +27,7 @@ Hello i'm Amine elsassi, also known as L3moon龙 on the internet. I'm a 22 year 
 ## Experience
 - August - 2022: Cybersecurity Analyst at Veganext California
 
-- October - 2021 -> October - 2022: Cybersecurity Analyst at Veganext California
+- October - 2021 -> October - 2022: Cybersecurity Consultant at P&P Tunisia
 
 - June - 2021 -> September - 2021: Blockchain Developer at T++ France 
 

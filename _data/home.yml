@@ -9,22 +9,9 @@ navbar_entries:
     url: https://l3moon.me/
 
 project_entries:
-  - title: Java Security Notes
-    url: JavaSecurityNotes
+  - title: PJSK CTF
+    url: https://github.com/project-sekai-ctf/sekaictf-2022
     desc: This is a project that I have been working on for a while.
-
-  - title: Web Security Notes
-    url: webSecurityNotes
-    desc: Fun Web Security Notes
-
-  - title: Web writeups 
-    url: webWriteups
-    desc: My CTF learning journey. 
-
-  - title: Blockchain Notes 
-    url: blockchainNotes
-    desc: My Blockchain learning journey. i'm still learning about this topic
-    highlight: WIP
 
 old_project_entries:
   - title: Securinets ISI CTF 2021
