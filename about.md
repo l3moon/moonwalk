@@ -37,5 +37,4 @@ Hello i'm Amine elsassi, also known as L3moon龙 on the internet. I'm a 22 year 
 ## Awards 
 - 2021: 1st place in the Tunisian Cybersecurity Challenge
 - 2022 : 4th place in (corCTF 2022 # 36.97 weight score) 
-- 2022 : 1st place in (corCTF 2022 # 36.97 weight score)
 - 2022 : 10th place in (zer0pts CTF 2022 # 52.62 weight score)
