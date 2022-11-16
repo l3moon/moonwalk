@@ -1,4 +1,9 @@
-# ez one line php : ez-php 
+---
+layout: post
+author: L3moon龙
+tags: [PHP, Web Security]
+---
+# ez one line php
 
 ## Main idea 
 
